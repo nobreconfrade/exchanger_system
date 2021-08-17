@@ -1,5 +1,6 @@
-package app.user
+package app.controller
 
+import app.model.User
 import java.util.concurrent.atomic.AtomicInteger
 
 class UserDao {

@@ -1,6 +1,6 @@
 package app
-import app.user.User
-import app.user.UserDao
+import app.model.User
+import app.controller.UserDao
 import io.javalin.Javalin;
 
 fun main(args: Array<String>){
