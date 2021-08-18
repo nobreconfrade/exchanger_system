@@ -1,15 +1,16 @@
 package app
 import app.controller.ExchangerController
-import app.scheduler.ExchangerScheduler
+import app.model.Transaction
 import io.javalin.Javalin
 import kotlinx.coroutines.*
+import java.util.*
 import java.util.logging.Logger
 
 
-data class UserInput(val id: String,
-                     val from: String,
-                     val to: String,
-                     val value: Float)
+data class InputFormat(val id: String,
+                       val from: String,
+                       val to: String,
+                       val value: Float)
 
 val logger = Logger.getLogger("root")
 
@@ -35,8 +36,25 @@ fun main(args: Array<String>) = runBlocking{
 
     logger.info("Setting up routes")
     app.post("/transaction"){ ctx ->
-        var data = ctx.body<UserInput>()
-
+        var data = ctx.body<InputFormat>()
+        val value_dest: Float
+        if (data.from == "USD"){
+            value_dest = data.value * rates[data.to]!! //TODO: remove !! since it will have values
+        } else {
+            var value_in_usd = data.value / rates[data.from]!! //TODO: remove !! since it will have values
+            value_dest = value_in_usd * rates[data.to]!! //TODO: remove !! since it will have values
+        }
+        val resp = hashMapOf<String, Any>(
+            "id_transaction" to 1, //TODO: Incremental last ID
+            "id_user" to data.id,
+            "currency_orig" to data.from,
+            "value_orig" to data.value,
+            "currency_dest" to data.to,
+            "value_dest" to value_dest,
+            "convertion_rate" to "WIP", //TODO: calculate convertion rate for non-USD currencies
+//            "date" to Calendar.getInstance(),
+        )
+        ctx.json(resp)
         ctx.status(201)
     }
     logger.info("Routes ready")
