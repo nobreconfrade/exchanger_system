@@ -1,8 +1,8 @@
 package app
 import app.controller.ExchangerController
-import app.controller.UserController
 import app.scheduler.ExchangerScheduler
 import io.javalin.Javalin
+import kotlinx.coroutines.*
 import java.util.logging.Logger
 
 
@@ -14,19 +14,29 @@ data class UserInput(val id: String,
 val logger = Logger.getLogger("root")
 
 
-fun main(args: Array<String>){
+fun main(args: Array<String>) = runBlocking{
     val app = Javalin.create().apply {
         exception(Exception::class.java) {e, ctx -> e.printStackTrace()}
         error(404) {ctx -> ctx.json("not found")}
     }.start(7000)
 
     val exchanger = ExchangerController()
-    val exchangerTask = ExchangerScheduler(exchanger, COROUTINE_INTERVAL)
-    exchangerTask.startRoutine()
+
+//    Initially I wanted to separate it in a different class, but the coroutine is locking the main thread
+//    val exchangerTask = ExchangerScheduler(exchanger, COROUTINE_INTERVAL)
+//    exchangerTask.startRoutine()
+
+    launch {
+        while (true){
+            exchanger.sendExchangeRequest()
+            delay(COROUTINE_INTERVAL)
+        }
+    }
 
     logger.info("Setting up routes")
     app.post("/transaction"){ ctx ->
         var data = ctx.body<UserInput>()
+        logger.info("IT WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         ctx.status(201)
     }
     logger.info("Routes ready")
