@@ -3,7 +3,7 @@ package app.controller
 import app.model.User
 import java.util.concurrent.atomic.AtomicInteger
 
-class UserDao {
+class UserController {
     val users = hashMapOf(
         0 to User(name = "Alice", email = "alice@alice.kt", id = 0),
         1 to User(name = "Bob", email = "bob@bob.kt", id = 1),
