@@ -36,7 +36,7 @@ fun main(args: Array<String>) = runBlocking{
     logger.info("Setting up routes")
     app.post("/transaction"){ ctx ->
         var data = ctx.body<UserInput>()
-        logger.info("IT WORKS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
         ctx.status(201)
     }
     logger.info("Routes ready")
