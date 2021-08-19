@@ -2,12 +2,11 @@ package app
 import app.controller.ExchangerController
 import app.controller.TransactionController
 import app.model.ExchangeRatesTable
+import app.model.TransactionTable
 import io.javalin.Javalin
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.lang.IndexOutOfBoundsException
-import java.time.LocalDateTime
 import java.util.logging.Logger
 
 
@@ -23,7 +22,7 @@ fun database_setup() {
         user = "postgres", password = "1234")
     transaction {
         addLogger(StdOutSqlLogger)
-        SchemaUtils.create(ExchangeRatesTable)
+        SchemaUtils.create(ExchangeRatesTable, TransactionTable)
     }
 }
 
