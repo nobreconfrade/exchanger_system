@@ -5,9 +5,11 @@ import app.controller.ExchangerController
 
 class ExchangerScheduler(val service: ExchangerController, val intervalMili: Long){
     suspend fun startRoutine() = coroutineScope {
-        launch {
-            service.sendExchangeRequest()
-            delay(intervalMili)
+        async {
+            while (true){
+                service.sendExchangeRequest()
+                delay(intervalMili)
+            }
         }
     }
 }

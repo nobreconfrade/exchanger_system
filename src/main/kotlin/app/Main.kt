@@ -3,10 +3,12 @@ import app.controller.ExchangerController
 import app.controller.TransactionController
 import app.model.ExchangeRatesTable
 import app.model.TransactionTable
+import app.scheduler.ExchangerScheduler
 import io.javalin.Javalin
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.concurrent.CompletableFuture
 import java.util.logging.Logger
 
 
@@ -30,7 +32,7 @@ fun database_setup() {
 
 
 
-fun main(args: Array<String>) = runBlocking{
+fun main(args: Array<String>) {
     val app = Javalin.create().apply {
         exception(Exception::class.java) {e, ctx -> e.printStackTrace()}
         error(404) {ctx -> ctx.json("not found")}
@@ -42,23 +44,22 @@ fun main(args: Array<String>) = runBlocking{
 
     val exchanger = ExchangerController()
     val transactions = TransactionController()
+    val exchangerTask = ExchangerScheduler(exchanger, COROUTINE_INTERVAL)
 
-//    Initially I wanted to separate it in a different class, but the coroutine is locking the main thread
-//    val exchangerTask = ExchangerScheduler(exchanger, COROUTINE_INTERVAL)
-//    exchangerTask.startRoutine()
-
-    launch {
-        while (true){
-            exchanger.sendExchangeRequest()
-            delay(COROUTINE_INTERVAL)
+    logger.info("Setting up async polling")
+    CompletableFuture.supplyAsync {
+        runBlocking {
+            exchangerTask.startRoutine()
         }
     }
+    logger.info("Async polling ready")
+
 
     logger.info("Setting up routes")
     app.post("/transaction"){ ctx ->
         var data = ctx.body<InputFormat>()
         val rates = exchanger.exchangeRateForLastTimestamp()
-        val resp = transactions.calculateConvertion(data, rates)
+        val resp = transactions.calculateConversion(data, rates)
         ctx.json(resp)
         ctx.status(200)
     }
