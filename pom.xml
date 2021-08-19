@@ -89,6 +89,11 @@
             <version>0.31.1</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-java-time</artifactId>
+            <version>0.31.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.23</version>
