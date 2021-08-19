@@ -3,7 +3,7 @@ import app.controller.ExchangerController
 import app.controller.TransactionController
 import app.model.ExchangeRatesTable
 import app.model.TransactionTable
-import app.scheduler.ExchangerScheduler
+import app.scheduler.ExchangerPolling
 import io.javalin.Javalin
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.*
@@ -44,7 +44,7 @@ fun main(args: Array<String>) {
 
     val exchanger = ExchangerController()
     val transactions = TransactionController()
-    val exchangerTask = ExchangerScheduler(exchanger, COROUTINE_INTERVAL)
+    val exchangerTask = ExchangerPolling(exchanger, COROUTINE_INTERVAL)
 
     logger.info("Setting up async polling")
     CompletableFuture.supplyAsync {
