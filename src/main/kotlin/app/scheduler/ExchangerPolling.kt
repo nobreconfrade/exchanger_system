@@ -10,6 +10,9 @@ import app.controller.ExchangerController
  * @property interval Delay for each polling, in milliseconds.
  */
 class ExchangerPolling(val ctrl: ExchangerController, val interval: Long){
+    /**
+     * Coroutine that start polling data from API.
+     */
     suspend fun startRoutine() = coroutineScope {
         async {
             while (true){
