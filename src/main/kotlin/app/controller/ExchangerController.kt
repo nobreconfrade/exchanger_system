@@ -3,6 +3,8 @@ package app.controller
 import app.API_KEY
 import app.API_URL
 import app.model.ExchangeRatesEntity
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -10,12 +12,16 @@ import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.*
 import java.util.logging.Logger
 
 class ExchangerController {
     private val logger = Logger.getLogger("ExchangerController")
 
-    private lateinit var ts: String
+    private var ts: Long = 0
     private var rates = hashMapOf<String, Float>(
         "BRL" to 0.0f,
         "EUR" to 0.0f,
@@ -31,7 +37,7 @@ class ExchangerController {
             // Clean the value string, remove whitespaces and trailing comma them transform to float
             var value = parts[1].trim().trim(',')
             if (id == "timestamp"){
-                ts = value
+                ts = value.toLong()
             }else if (id == "base"){
                 value = value.replace("\"", "")
                 if (value == "USD"){
@@ -73,7 +79,8 @@ class ExchangerController {
 
                 transaction {
                     ExchangeRatesEntity.new {
-                        timestamp = ts
+                        datetime = LocalDateTime.ofInstant(Instant.ofEpochSecond(ts),
+                            ZoneId.of("America/Sao_Paulo"))
                         BRL = rates["BRL"]!!  // Without (!!) it assumes optional variable
                         JPY = rates["JPY"]!!
                         EUR = rates["EUR"]!!

@@ -4,9 +4,12 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.`java-time`.datetime
+import java.sql.Timestamp
+import java.util.*
 
 object ExchangeRatesTable: IntIdTable("exchange_rates"){
-    val timestamp = varchar("timestamp", 50)
+    val datetime = datetime("datetime")
     val BRL = float("brazilian_real")
     val JPY = float("japanese_yen")
     val EUR = float("european_euro")
@@ -16,12 +19,20 @@ object ExchangeRatesTable: IntIdTable("exchange_rates"){
 class ExchangeRatesEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ExchangeRatesEntity>(ExchangeRatesTable)
 
-    var timestamp by ExchangeRatesTable.timestamp
+    var datetime by ExchangeRatesTable.datetime
     var BRL by ExchangeRatesTable.BRL
     var JPY by ExchangeRatesTable.JPY
     var EUR by ExchangeRatesTable.EUR
     var USD by ExchangeRatesTable.USD
 
-    override fun toString(): String = "ExchangeRates($timestamp, $BRL, $JPY, $EUR, $USD)"
-
+    override fun toString(): String = "ExchangeRates($datetime, $BRL, $JPY, $EUR, $USD)"
 }
+
+data class ExchangeRates (
+    val id: Int,
+    val datetime: Date,
+    val BRL: Float,
+    val JPY: Float,
+    val EUR: Float,
+    val USD: Float
+)
