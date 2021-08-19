@@ -8,9 +8,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 
 class TransactionController {
-    fun calculateConvertion(user_data: InputFormat, rates: HashMap<String, Float>): HashMap<String, Any>{
+    fun calculateConversion(user_data: InputFormat, rates: HashMap<String, Float>): HashMap<String, Any>{
         val value_dest: Float
         val calc_conversion_rate: Float
+        if (rates["USD"] != 0f){
+            throw NotImplementedError("Conversion function is only ready for USD base rates")
+        }
         if (user_data.from == "USD"){
             value_dest = user_data.value * rates[user_data.to]!! //TODO: Check why (!!) are necessary
             calc_conversion_rate = rates[user_data.to]!!
@@ -37,7 +40,7 @@ class TransactionController {
             "value_orig" to user_data.value,
             "currency_dest" to user_data.to,
             "value_dest" to value_dest,
-            "convertion_rate" to calc_conversion_rate,
+            "conversion_rate" to calc_conversion_rate,
             "date" to datetime_now.toString()
         )
     }

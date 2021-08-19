@@ -83,7 +83,6 @@ class ExchangerController {
         params += "&symbols=EUR,JPY,BRL"
         val mURL = URL(API_URL +params)
         with(mURL.openConnection() as HttpURLConnection) {
-            // optional default is GET
             requestMethod = "POST"
             doOutput = true
 
