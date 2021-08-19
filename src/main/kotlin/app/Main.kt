@@ -1,9 +1,11 @@
 package app
+import app.controller.EmptyExchangeRateException
 import app.controller.ExchangerController
 import app.controller.TransactionController
 import app.model.ExchangeRatesTable
 import app.model.TransactionTable
 import app.scheduler.ExchangerPolling
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import io.javalin.Javalin
 import kotlinx.coroutines.*
 import org.jetbrains.exposed.sql.*
@@ -70,7 +72,7 @@ fun main(args: Array<String>) {
      *  }
      */
     app.post("/transaction"){ ctx ->
-        var data = ctx.body<InputFormat>()
+        val data = ctx.body<InputFormat>()
         val rates = exchanger.exchangeRateForLastTimestamp()
         val resp = transactions.calculateConversion(data, rates)
         ctx.json(resp)
@@ -87,5 +89,25 @@ fun main(args: Array<String>) {
         val resp = transactions.getTransactionByKey(ctx.pathParam("user_key"))
         ctx.json(resp)
     }
+
+    app.exception(MissingKotlinParameterException::class.java) { e, ctx ->
+        ctx.json(
+            hashMapOf(
+                "msg" to "Your payload is malformed, review the syntax"
+            )
+        )
+        ctx.status(400)
+    }
+
+    app.exception(EmptyExchangeRateException::class.java) { e, ctx ->
+        ctx.json(
+            hashMapOf(
+                "msg" to "Exchange rates table is empty! " +
+                        "Contact the admin for more info"
+            )
+        )
+        ctx.status(500)
+    }
+
     logger.info("Routes ready")
 }

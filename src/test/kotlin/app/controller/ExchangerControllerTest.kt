@@ -43,7 +43,7 @@ internal class ExchangerControllerTest: DatabaseForTest("exchange_controller_tes
 
     @Test
     fun `test throws error when exchange rate table is empty`(){
-        assertFailsWith<IndexOutOfBoundsException> {
+        assertFailsWith<EmptyExchangeRateException> {
             testExchangerController.exchangeRateForLastTimestamp()
         }
     }

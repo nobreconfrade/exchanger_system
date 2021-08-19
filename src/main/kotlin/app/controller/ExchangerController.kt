@@ -20,6 +20,9 @@ import java.time.ZoneId
 import java.util.*
 import java.util.logging.Logger
 
+class EmptyExchangeRateException(message:String): Exception(message)
+
+
 /**
  * Exchange rates class with serialization, calculation and fetching knowledge.
  */
@@ -76,7 +79,7 @@ class ExchangerController {
         try {
             newestRow = resultRows[0]
         } catch (e: IndexOutOfBoundsException){
-            throw IndexOutOfBoundsException("Exchange rates table is empty! To perform a conversion at least one row is necessary")
+            throw EmptyExchangeRateException("Exchange rates table is empty! To perform a conversion at least one row is necessary")
         }
         for (el in resultRows){
             if (el[ExchangeRatesTable.datetime] > newestRow[ExchangeRatesTable.datetime])
