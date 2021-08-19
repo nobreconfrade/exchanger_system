@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.logging.Logger
 
 
-data class InputFormat(val id: String,
+data class InputFormat(val key: String,
                        val from: String,
                        val to: String,
                        val value: Float)
@@ -59,6 +59,11 @@ fun main(args: Array<String>) = runBlocking{
         val resp = transactions.calculateConvertion(data, rates)
         ctx.json(resp)
         ctx.status(200)
+    }
+
+    app.get("/transaction/:user_key") { ctx ->
+        val resp = transactions.getTransactionByKey(ctx.pathParam("user_key"))
+        ctx.json(resp)
     }
     logger.info("Routes ready")
 

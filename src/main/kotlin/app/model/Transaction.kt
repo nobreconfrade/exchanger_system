@@ -11,7 +11,7 @@ object TransactionTable: IntIdTable("transaction"){
     val currency_orig = varchar("currency_origin", 3)
     val value_orig = float("value_origin")
     val currency_dest = varchar("currency_destiny", 3)
-    val covertion_rate = float("convertion_rate")
+    val conversion_rate = float("conversion_rate")
     val date = datetime("date")
 }
 
@@ -22,7 +22,7 @@ class TransactionEntity(id: EntityID<Int>) : IntEntity(id) {
     var currency_orig by TransactionTable.currency_orig
     var value_orig by TransactionTable.value_orig
     var currency_dest by TransactionTable.currency_dest
-    var covertion_rate by TransactionTable.covertion_rate
+    var conversion_rate by TransactionTable.conversion_rate
     var date by TransactionTable.date
 
     override fun toString(): String = "TransactionEntity(" +
@@ -30,6 +30,6 @@ class TransactionEntity(id: EntityID<Int>) : IntEntity(id) {
             "$currency_orig, " +
             "$value_orig, " +
             "$currency_dest, " +
-            "$covertion_rate" +
+            "$conversion_rate" +
             "$date)"
 }
