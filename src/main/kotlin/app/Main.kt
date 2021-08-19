@@ -10,10 +10,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.logging.Logger
 
 
-data class InputFormat(val key: String,
-                       val from: String,
-                       val to: String,
-                       val value: Float)
+data class InputFormat(
+    val key: String,
+    val from: String,
+    val to: String,
+    val value: Float
+)
 
 val logger = Logger.getLogger("root")
 
@@ -66,34 +68,4 @@ fun main(args: Array<String>) = runBlocking{
         ctx.json(resp)
     }
     logger.info("Routes ready")
-
-//    app.get("/users") { ctx ->
-//        ctx.json(userController.users)
-//    }
-//    app.get("/users/:user-id") { ctx ->
-//        ctx.json(userController.findById(ctx.pathParam("user-id").toInt())!!)
-//    }
-//    app.get("/users/email/:email") { ctx ->
-//        ctx.json(userController.findByEmail(ctx.pathParam("email"))!!)
-//    }
-//
-//    app.post("/users") { ctx ->
-//        val user = ctx.body<User>()
-//        userController.save(name = user.name, email = user.email)
-//        ctx.status(201)
-//    }
-//
-//    app.patch("/users/:user-id") { ctx ->
-//        val user = ctx.body<User>()
-//        userController.update(
-//            id = ctx.pathParam("user-id").toInt(),
-//            user = user
-//        )
-//        ctx.status(204)
-//    }
-//
-//    app.delete("/users/:user-id") { ctx ->
-//        userController.delete(ctx.pathParam("user-id").toInt())
-//        ctx.status(204)
-//    }
 }

@@ -5,8 +5,6 @@ import app.API_URL
 import app.model.ExchangeRatesEntity
 import app.model.ExchangeRatesTable
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.BufferedReader
