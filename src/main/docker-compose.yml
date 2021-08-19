@@ -1,0 +1,11 @@
+services:
+
+  # SQL database
+  postgres:
+    image: "postgres:13.4"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: "postgres"
