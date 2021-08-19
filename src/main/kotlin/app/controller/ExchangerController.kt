@@ -20,6 +20,9 @@ import java.time.ZoneId
 import java.util.*
 import java.util.logging.Logger
 
+/**
+ * Exchange rates class with serialization, calculation and fetching knowledge.
+ */
 class ExchangerController {
     private val logger = Logger.getLogger("ExchangerController")
 
@@ -31,6 +34,11 @@ class ExchangerController {
         "USD" to 0.0f
     )
 
+    /**
+     * Serialize data from Open Exchange Rates API response.
+     *
+     * @property inputLine Next line to be parsed.
+     */
     private fun exchangerSerializer(inputLine: String) {
         var parts = inputLine.split(":")
         if (parts.size == 2) {
@@ -53,6 +61,12 @@ class ExchangerController {
         }
     }
 
+    /**
+     * Return the most recent currency exchange rate from database.
+     *
+     * @return A HashMap with the currency abbreviation to rate,
+     * these rates are based in a base currency that will have rate 0.
+     */
     fun exchangeRateForLastTimestamp(): HashMap<String, Float>{
         var rates: HashMap<String, Float>
         var resultRows = transaction {
@@ -77,6 +91,9 @@ class ExchangerController {
         return rates
     }
 
+    /**
+     * Request the exchange rates to a external API and put the results on the database.
+    */
     fun sendExchangeRequest(){
         var params = "app_id=" + URLEncoder.encode(API_KEY, "UTF-8")
         params += "&base=USD"

@@ -21,6 +21,9 @@ data class InputFormat(
 
 val logger = Logger.getLogger("root")
 
+/**
+ * Setup database configurations and create tables if it does not exists.
+ */
 fun database_setup() {
     Database.connect("jdbc:postgresql://localhost:5432/", driver = "org.postgresql.Driver",
         user = "postgres", password = "1234")
@@ -56,6 +59,16 @@ fun main(args: Array<String>) {
 
 
     logger.info("Setting up routes")
+    /**
+     * Conversion endpoint, accepts POST with expected payload:
+     *
+     *  {
+     *      "key": <STRING>,
+     *      "from": <STRING>,
+     *      "to": <STRING>,
+     *      "value": <NUMBER>
+     *  }
+     */
     app.post("/transaction"){ ctx ->
         var data = ctx.body<InputFormat>()
         val rates = exchanger.exchangeRateForLastTimestamp()
@@ -64,6 +77,12 @@ fun main(args: Array<String>) {
         ctx.status(200)
     }
 
+    /**
+     * Query by user key, accepts GET with path param:
+     *      "user_key": <STRING>
+     *
+     * e.g. myapp/api/v0/transaction/my_user_key
+     */
     app.get("/transaction/:user_key") { ctx ->
         val resp = transactions.getTransactionByKey(ctx.pathParam("user_key"))
         ctx.json(resp)

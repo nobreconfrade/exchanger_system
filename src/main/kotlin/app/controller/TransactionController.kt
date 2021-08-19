@@ -7,7 +7,17 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 
+/**
+ * Class that handle transactions conversions and maintaining.
+ */
 class TransactionController {
+    /**
+     * Calculates the convertion and return a HashMap with results.
+     *
+     * @property user_data Data from request body.
+     * @property rates Most recent exchange rates on database.
+     * @return A HashMap roughtly like TranslationEntity, but with final converted value.
+     */
     fun calculateConversion(user_data: InputFormat, rates: HashMap<String, Float>): HashMap<String, Any>{
         val value_dest: Float
         val calc_conversion_rate: Float
@@ -45,6 +55,12 @@ class TransactionController {
         )
     }
 
+    /**
+     * Ask from the database for all transactions of a given user key.
+     *
+     * @property key User identification key.
+     * @return A mutable list with all user operations, or empty mutable list.
+     */
     fun getTransactionByKey(key: String): MutableList<HashMap<String, Any>?>{
         val trs_by_key = transaction {
             TransactionTable.select{ TransactionTable.user_key eq key}.toList()

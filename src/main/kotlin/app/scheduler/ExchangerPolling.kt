@@ -3,12 +3,18 @@ import kotlinx.coroutines.*
 
 import app.controller.ExchangerController
 
-class ExchangerPolling(val service: ExchangerController, val intervalMili: Long){
+/**
+ * Class with polling knowledge.
+ *
+ * @property ctrl The exchanger rate controller.
+ * @property interval Delay for each polling, in milliseconds.
+ */
+class ExchangerPolling(val ctrl: ExchangerController, val interval: Long){
     suspend fun startRoutine() = coroutineScope {
         async {
             while (true){
-                service.sendExchangeRequest()
-                delay(intervalMili)
+                ctrl.sendExchangeRequest()
+                delay(interval)
             }
         }
     }
