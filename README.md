@@ -4,7 +4,7 @@ with `Javalin`. Made with `Ubuntu 20.10`.
 
 All app related dependencies are listed in `pom.xml`.
 
-to run the app, simply execute `Main.kt`.
+to run the app, execute `Main.kt`.
 
 ## Database
 In this system, the chosen database was a Postgres v13.4. I used a `docker` 
