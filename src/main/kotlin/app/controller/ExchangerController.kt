@@ -3,12 +3,16 @@ package app.controller
 import app.API_KEY
 import app.API_URL
 import app.model.ExchangeRatesEntity
+import app.model.ExchangeRatesTable
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.lang.IndexOutOfBoundsException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
@@ -49,6 +53,30 @@ class ExchangerController {
                 rates[id] = value.toFloat()
             }
         }
+    }
+
+    fun exchangeRateForLastTimestamp(): HashMap<String, Float>{
+        var rates: HashMap<String, Float>
+        var resultRows = transaction {
+            ExchangeRatesTable.selectAll().sortedByDescending { ExchangeRatesTable.datetime }
+        }
+        var newestRow: ResultRow
+        try {
+            newestRow = resultRows[0]
+        } catch (e: IndexOutOfBoundsException){
+            throw IndexOutOfBoundsException("Exchange rates table is empty! To perform a conversion at least one row is necessary")
+        }
+        for (el in resultRows){
+            if (el[ExchangeRatesTable.datetime] > newestRow[ExchangeRatesTable.datetime])
+                newestRow = el
+        }
+        rates = hashMapOf(
+            "BRL" to newestRow[ExchangeRatesTable.BRL],
+            "JPY" to newestRow[ExchangeRatesTable.JPY],
+            "EUR" to newestRow[ExchangeRatesTable.EUR],
+            "USD" to newestRow[ExchangeRatesTable.USD]
+        )
+        return rates
     }
 
     fun sendExchangeRequest(){

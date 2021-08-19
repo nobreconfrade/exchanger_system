@@ -1,5 +1,6 @@
 package app
 import app.controller.ExchangerController
+import app.controller.TransactionController
 import app.model.ExchangeRatesTable
 import io.javalin.Javalin
 import kotlinx.coroutines.*
@@ -26,29 +27,7 @@ fun database_setup() {
     }
 }
 
-fun get_last_timestamp(): HashMap<String, Float>{
-    var rates: HashMap<String, Float>
-    var resultRows = transaction {
-        ExchangeRatesTable.selectAll().sortedByDescending { ExchangeRatesTable.datetime }
-    }
-    var newestRow: ResultRow
-    try {
-        newestRow = resultRows[0]
-    } catch (e: IndexOutOfBoundsException){
-        throw IndexOutOfBoundsException("Exchange rates table is empty! To perform a conversion at least one row is necessary")
-    }
-    for (el in resultRows){
-        if (el[ExchangeRatesTable.datetime] > newestRow[ExchangeRatesTable.datetime])
-            newestRow = el
-    }
-    rates = hashMapOf(
-        "BRL" to newestRow[ExchangeRatesTable.BRL],
-        "JPY" to newestRow[ExchangeRatesTable.JPY],
-        "EUR" to newestRow[ExchangeRatesTable.EUR],
-        "USD" to newestRow[ExchangeRatesTable.USD]
-    )
-    return rates
-}
+
 
 fun main(args: Array<String>) = runBlocking{
     val app = Javalin.create().apply {
@@ -61,6 +40,7 @@ fun main(args: Array<String>) = runBlocking{
     logger.info("Database connected and created")
 
     val exchanger = ExchangerController()
+    val transactions = TransactionController()
 
 //    Initially I wanted to separate it in a different class, but the coroutine is locking the main thread
 //    val exchangerTask = ExchangerScheduler(exchanger, COROUTINE_INTERVAL)
@@ -76,28 +56,8 @@ fun main(args: Array<String>) = runBlocking{
     logger.info("Setting up routes")
     app.post("/transaction"){ ctx ->
         var data = ctx.body<InputFormat>()
-        val value_dest: Float
-        val rates = get_last_timestamp()
-        val convertion_rate: Float
-        if (data.from == "USD"){
-            value_dest = data.value * rates[data.to]!! //TODO: Check why (!!) are necessary
-            convertion_rate = rates[data.to]!!
-        } else {
-            var value_in_usd = data.value / rates[data.from]!!
-            value_dest = value_in_usd * rates[data.to]!!
-            convertion_rate = value_dest / data.value
-        }
-
-        val resp = hashMapOf<String, Any>(
-            "id_transaction" to 1, //TODO: Incremental last ID
-            "id_user" to data.id,
-            "currency_orig" to data.from,
-            "value_orig" to data.value,
-            "currency_dest" to data.to,
-            "value_dest" to value_dest,
-            "convertion_rate" to convertion_rate,
-            "date" to LocalDateTime.now().toString()
-        )
+        val rates = exchanger.exchangeRateForLastTimestamp()
+        val resp = transactions.calculateConvertion(data, rates)
         ctx.json(resp)
         ctx.status(200)
     }
