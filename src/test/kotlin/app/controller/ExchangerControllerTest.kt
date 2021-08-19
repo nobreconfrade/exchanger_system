@@ -3,17 +3,9 @@ package app.controller
 import DatabaseForTest
 import app.model.ExchangeRatesEntity
 import app.model.ExchangeRatesTable
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.postgresql.core.ConnectionFactory
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.LocalDateTime
 import kotlin.test.assertFailsWith
 
